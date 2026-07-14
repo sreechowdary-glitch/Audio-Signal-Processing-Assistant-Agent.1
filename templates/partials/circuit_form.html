@@ -1,0 +1,253 @@
+<!-- Circuit Diagnostic Form — included in tab-circuit -->
+
+<div class="dashboard-grid" style="grid-template-columns:360px 1fr;gap:1.25rem">
+
+  <!-- ── FORM COLUMN ───────────────────────────────── -->
+  <div style="display:flex;flex-direction:column;gap:1.25rem">
+
+    <div class="card">
+      <div class="card__header">
+        <span class="card__title">
+          <svg class="card__title-icon" viewBox="0 0 16 16"><path d="M8.75 1a.75.75 0 0 0-1.5 0v1.5H5.5a.75.75 0 0 0 0 1.5h1.75v1H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H9.25v-1H11a.75.75 0 0 0 0-1.5H9.25zm-4.5 6H11.5a.5.5 0 0 1 .5.5V13a.5.5 0 0 1-.5.5H4.75a.5.5 0 0 1-.5-.5V7.5a.5.5 0 0 1 .5-.5z"/></svg>
+          Circuit Parameters
+        </span>
+      </div>
+      <div class="card__body">
+        <form id="circuit-form" novalidate>
+
+          <div class="form-group">
+            <label class="form-label" for="circuit_type">Circuit Type <span class="required">*</span></label>
+            <select class="form-control form-select" id="circuit_type" name="circuit_type" required>
+              <option value="">— Select topology —</option>
+              <option value="non_inverting">Non-Inverting Amplifier</option>
+              <option value="inverting">Inverting Amplifier</option>
+              <option value="difference">Difference Amplifier</option>
+              <option value="integrator">Integrator</option>
+              <option value="comparator">Comparator</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="op_amp_model">Op-Amp Model <span class="required">*</span></label>
+            <select class="form-control form-select" id="op_amp_model" name="op_amp_model" required>
+              <option value="">— Select device —</option>
+              <optgroup label="General Purpose">
+                <option value="LM358">LM358 — 1 MHz, 0.5 V/µs</option>
+                <option value="LM741">LM741 — 1 MHz, 0.5 V/µs (classic)</option>
+                <option value="TL071">TL071 — 3 MHz, 13 V/µs (JFET)</option>
+              </optgroup>
+              <optgroup label="Audio Grade">
+                <option value="NE5532">NE5532 — 10 MHz, 9 V/µs (low noise)</option>
+                <option value="LM386">LM386 — Low-power audio amp</option>
+                <option value="OPA2134">OPA2134 — 8 MHz, 20 V/µs (precision)</option>
+              </optgroup>
+              <optgroup label="Instrumentation">
+                <option value="AD8221">AD8221 — INA, 130 dB CMRR</option>
+              </optgroup>
+              <option value="GENERIC">GENERIC — Generic parameters</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="supply-voltage">Supply Voltage (±V) <span class="required">*</span></label>
+              <input class="form-control" type="number" id="supply-voltage" name="supply_voltage_v"
+                     min="1.5" max="22" step="0.5" value="12" placeholder="e.g. 12" required/>
+              <span class="form-hint">Enter positive value (e.g. 12 for ±12V)</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="gain">Gain <span class="required">*</span></label>
+              <input class="form-control" type="number" id="gain" name="gain"
+                     min="1" max="10000" step="1" value="10" required/>
+              <span class="form-hint">Preview: <strong id="gain-preview">10×</strong></span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="input-signal-mv">Input Signal (mV) <span class="required">*</span></label>
+              <input class="form-control" type="number" id="input-signal-mv" name="input_signal_mv"
+                     min="0.001" max="10000" step="1" value="100" required/>
+              <span class="form-hint">Peak amplitude in millivolts</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="signal-freq">Signal Frequency (Hz)</label>
+              <input class="form-control" type="number" id="signal-freq" name="signal_freq_hz"
+                     min="1" max="200000" step="1" value="1000"/>
+              <span class="form-hint">Default: 1000 Hz</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="observed-issue">Observed Issue</label>
+            <select class="form-control form-select" id="observed-issue" name="observed_issue">
+              <option value="none">None / Testing only</option>
+              <option value="output_clipping">Output Clipping</option>
+              <option value="oscillation">Oscillation / Instability</option>
+              <option value="hum_noise">Hum / Power Line Noise</option>
+              <option value="ground_loop">Ground Loop</option>
+              <option value="distortion">Distortion</option>
+              <option value="gain_instability">Gain Instability</option>
+              <option value="no_output">No Output</option>
+              <option value="low_output">Low Output</option>
+            </select>
+          </div>
+
+          <!-- Expected output live preview -->
+          <div class="alert alert--info" style="margin-bottom:1rem">
+            <svg class="alert__icon" viewBox="0 0 16 16"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 10.5a.75.75 0 0 1-1.5 0V7.25a.75.75 0 0 1 1.5 0zM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg>
+            <span>Expected output: <strong id="expected-output-preview">—</strong></span>
+          </div>
+
+          <button type="submit" class="btn btn--primary btn--full" id="btn-diagnose">
+            <svg class="btn__icon" viewBox="0 0 16 16"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm3.78 5.5-4.5 4.5a.75.75 0 0 1-1.06 0l-2-2a.75.75 0 1 1 1.06-1.06L6.75 9.44l3.97-3.97a.75.75 0 1 1 1.06 1.06z"/></svg>
+            Run Diagnostic
+          </button>
+
+          <!-- Loading overlay -->
+          <div id="circuit-loading" style="display:none;justify-content:center;align-items:center;gap:.75rem;padding:1rem">
+            <div class="spinner"></div>
+            <span style="font-size:var(--fs-sm);color:var(--gray-70)">Evaluating 38 engineering rules…</span>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+  </div><!-- /form column -->
+
+  <!-- ── RESULTS COLUMN ────────────────────────────── -->
+  <div id="circuit-results-section" style="display:none;flex-direction:column;gap:1.25rem">
+
+    <!-- Primary Issue banner -->
+    <div class="card" style="border-left:4px solid var(--ibm-blue-60)">
+      <div class="card__body card__body--tight">
+        <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+          <div>
+            <div style="font-size:var(--fs-xs);color:var(--gray-60);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:.25rem">Primary Issue</div>
+            <div style="font-size:var(--fs-md);font-weight:700;color:var(--gray-90)" id="primary-issue-text">—</div>
+          </div>
+          <div style="margin-left:auto;display:flex;gap:.5rem;align-items:center">
+            <span class="badge badge--critical" id="critical-count-badge">0</span>
+            <span style="font-size:var(--fs-xs);color:var(--gray-60)">critical</span>
+            <span class="badge badge--high" id="high-count-badge">0</span>
+            <span style="font-size:var(--fs-xs);color:var(--gray-60)">high</span>
+            <span style="font-size:var(--fs-xs);color:var(--gray-60);margin-left:.25rem"><strong id="total-rules-count">0</strong> rules triggered</span>
+          </div>
+        </div>
+        <hr class="divider" style="margin:.875rem 0"/>
+        <div style="font-size:var(--fs-xs);color:var(--gray-60);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.25rem">Root Cause</div>
+        <div style="font-size:var(--fs-sm);color:var(--gray-80);line-height:1.6" id="root-cause-text">—</div>
+      </div>
+    </div>
+
+    <!-- Circuit Reliability Score card -->
+    <div class="card reliability-card">
+      <div class="card__header">
+        <span class="card__title">
+          <svg class="card__title-icon" viewBox="0 0 16 16"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 3a4 4 0 1 1 0 8A4 4 0 0 1 8 4zm1.5 2.5a.75.75 0 0 0-1.5 0V8c0 .2.08.39.22.53l1.5 1.5a.75.75 0 1 0 1.06-1.06L9.5 7.94z"/></svg>
+          Circuit Reliability Score
+        </span>
+      </div>
+      <div class="card__body">
+        <div class="gauge-wrapper">
+          <div class="gauge-svg-container" id="gauge-svg-container">
+            <!-- SVG gauge injected by health_gauge.js -->
+          </div>
+          <div class="gauge-score-label" style="position:static;transform:none;text-align:center">
+            <span class="gauge-score-value" id="gauge-score-value">—</span>
+            <span class="gauge-score-max">/ 100</span>
+          </div>
+          <div class="gauge-classification" id="gauge-classification">—</div>
+        </div>
+
+        <hr class="divider"/>
+
+        <div class="section-label">Domain Sub-Scores</div>
+        <div class="domain-scores" id="domain-scores">
+          <!-- injected by health_gauge.js -->
+        </div>
+
+        <div class="score-formula" id="score-formula" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- Computed engineering values -->
+    <div class="card">
+      <div class="card__header">
+        <span class="card__title">
+          <svg class="card__title-icon" viewBox="0 0 16 16"><path d="M1 3.5A1.5 1.5 0 0 1 2.5 2h11A1.5 1.5 0 0 1 15 3.5v9A1.5 1.5 0 0 1 13.5 14h-11A1.5 1.5 0 0 1 1 12.5zM2.5 3.5v9h11v-9z"/></svg>
+          Computed Engineering Values
+        </span>
+        <span style="font-size:var(--fs-xs);color:var(--gray-60)">by circuit_calculator.py</span>
+      </div>
+      <div class="card__body card__body--tight">
+        <div id="circuit-calculations">
+          <!-- injected by circuit_form.js -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Triggered Rules table -->
+    <div class="card">
+      <div class="card__header">
+        <span class="card__title">
+          <svg class="card__title-icon" viewBox="0 0 16 16"><path d="M8.74 1.37a.85.85 0 0 0-1.48 0L.37 13.25A.85.85 0 0 0 1.11 14.5h13.78a.85.85 0 0 0 .74-1.25Z"/></svg>
+          Triggered Engineering Rules
+        </span>
+        <span class="badge badge--info" id="triggered-rules-count">0</span>
+      </div>
+      <div class="card__body card__body--flush">
+        <div class="rules-table-wrapper">
+          <table class="rules-table">
+            <thead>
+              <tr>
+                <th style="width:52px">ID</th>
+                <th style="width:80px">Severity</th>
+                <th style="width:130px">Category</th>
+                <th>Fault Name</th>
+                <th>Engineering Detail</th>
+              </tr>
+            </thead>
+            <tbody id="triggered-rules-body">
+              <tr><td colspan="5" style="text-align:center;color:var(--gray-60);padding:2rem">
+                Run a diagnostic to see triggered rules.
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Corrective Actions -->
+    <div class="card">
+      <div class="card__header">
+        <span class="card__title">
+          <svg class="card__title-icon" viewBox="0 0 16 16"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm3.78 5.5-4.5 4.5a.75.75 0 0 1-1.06 0l-2-2a.75.75 0 1 1 1.06-1.06L6.75 9.44l3.97-3.97a.75.75 0 1 1 1.06 1.06z"/></svg>
+          Corrective Actions
+        </span>
+      </div>
+      <div class="card__body">
+        <ol class="actions-list" id="corrective-actions-list">
+          <li>No diagnostic run yet.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Report download -->
+    <div class="report-bar" id="report-download-bar" style="display:none">
+      <svg class="report-bar__icon" viewBox="0 0 16 16"><path d="M8 1a.75.75 0 0 1 .75.75v6.19l1.97-1.97a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.03a.75.75 0 0 1 1.06-1.06l1.97 1.97V1.75A.75.75 0 0 1 8 1zM2 14.5A.75.75 0 0 1 2.75 14h10.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 14.5z"/></svg>
+      <div class="report-bar__text">
+        <p class="report-bar__title">Engineering Report Ready</p>
+        <p class="report-bar__sub">PDF with full circuit diagnostic analysis.</p>
+      </div>
+      <button class="btn btn--primary" id="btn-download-report" disabled>Download PDF Report</button>
+    </div>
+
+  </div><!-- /results column -->
+</div><!-- /circuit grid -->
+
+<!-- Granite explanation — full width -->
+<div style="margin-top:1.25rem">
+  {% include "partials/granite_panel.html" %}
+</div>

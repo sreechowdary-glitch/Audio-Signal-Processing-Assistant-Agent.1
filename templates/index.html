@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Audio Intelligence & Circuit Diagnostic Platform{% endblock %}
+
+{% block content %}
+<!-- ════════════════════════════════════════════════════════
+     TAB 1 — AUDIO SIGNAL ANALYSIS
+     ════════════════════════════════════════════════════════ -->
+<div class="tab-pane active" id="tab-audio">
+  <div class="dashboard-grid" style="grid-template-columns:1fr 1fr">
+
+    <!-- ── LEFT COLUMN ─────────────────────────────── -->
+    <div style="display:flex;flex-direction:column;gap:1.25rem">
+
+      <!-- Upload card -->
+      <div class="card">
+        <div class="card__header">
+          <span class="card__title">
+            <svg class="card__title-icon" viewBox="0 0 16 16"><path d="M8 1a.75.75 0 0 1 .75.75v5.5h5.5a.75.75 0 0 1 0 1.5h-5.5v5.5a.75.75 0 0 1-1.5 0v-5.5H1.75a.75.75 0 0 1 0-1.5h5.5v-5.5A.75.75 0 0 1 8 1z"/></svg>
+            Upload Audio File
+          </span>
+        </div>
+        <div class="card__body">
+          <div class="upload-zone" id="upload-zone">
+            <input type="file" id="audio-file-input" accept=".wav,.mp3,.flac" aria-label="Select audio file"/>
+            <svg class="upload-zone__icon" viewBox="0 0 32 32">
+              <path d="M26 24H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h20a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2zm0-16H6v14h20zM16 10l-6 7h4v5h4v-5h4z"/>
+            </svg>
+            <p class="upload-zone__title">Drop audio file here or click to browse</p>
+            <p class="upload-zone__sub">Supports WAV, MP3, FLAC files</p>
+            <p class="upload-zone__formats">Maximum size: 50 MB &nbsp;·&nbsp; Maximum duration: 5 minutes</p>
+          </div>
+
+          <!-- Selected file info -->
+          <div class="file-info" id="file-info" style="display:none">
+            <svg class="file-info__icon" viewBox="0 0 16 16"><path d="M9.75 1H4.5A1.5 1.5 0 0 0 3 2.5v11A1.5 1.5 0 0 0 4.5 15h7A1.5 1.5 0 0 0 13 13.5V4.25zm0 1.5 1.75 1.75H9.75zM4.5 13.5v-11H8.25v3.25H11.5V13.5z"/></svg>
+            <span class="file-info__name">—</span>
+            <span class="file-info__size"></span>
+            <button class="file-info__remove" aria-label="Remove file">&times;</button>
+          </div>
+
+          <!-- Progress -->
+          <div class="progress" id="upload-progress" style="display:none">
+            <div class="progress__bar" id="upload-progress-bar"></div>
+          </div>
+
+          <div style="margin-top:1rem">
+            <button class="btn btn--primary btn--full" id="btn-analyse" disabled>
+              <svg class="btn__icon" viewBox="0 0 16 16"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm3.78 5.5-4.5 4.5a.75.75 0 0 1-1.06 0l-2-2a.75.75 0 1 1 1.06-1.06L6.75 9.44l3.97-3.97a.75.75 0 1 1 1.06 1.06z"/></svg>
+              Analyse Audio
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Signal Metrics card -->
+      <div class="card">
+        <div class="card__header">
+          <span class="card__title">
+            <svg class="card__title-icon" viewBox="0 0 16 16"><path d="M1 8a7 7 0 1 1 14 0A7 7 0 0 1 1 8zm7-5a5 5 0 1 0 0 10A5 5 0 0 0 8 3zm.75 2.75a.75.75 0 0 0-1.5 0V8c0 .2.08.39.22.53l2 2a.75.75 0 1 0 1.06-1.06L8.75 7.94z"/></svg>
+            Signal Quality Metrics
+          </span>
+        </div>
+        <div class="card__body">
+          <div id="metrics-panel">
+            <div class="empty-state">
+              <svg viewBox="0 0 32 32"><path d="M27 6H5a1 1 0 0 0-1 1v18a1 1 0 0 0 1 1h22a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1zm-1 18H6V8h20zm-9-3H9v-2h8zm5-4H9v-2h13zm0-4H9V11h13z"/></svg>
+              <h3>No analysis yet</h3>
+              <p>Upload and analyse an audio file to see metrics.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fault Detection card -->
+      <div class="card">
+        <div class="card__header">
+          <span class="card__title">
+            <svg class="card__title-icon" viewBox="0 0 16 16"><path d="M8.74 1.37a.85.85 0 0 0-1.48 0L.37 13.25A.85.85 0 0 0 1.11 14.5h13.78a.85.85 0 0 0 .74-1.25ZM8 12a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm.75-4.25a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0z"/></svg>
+            Detected Audio Faults
+          </span>
+        </div>
+        <div class="card__body">
+          <div id="fault-list">
+            <div class="empty-state">
+              <svg viewBox="0 0 32 32"><path d="M16 2a14 14 0 1 0 0 28A14 14 0 0 0 16 2zm0 6a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm2 14h-4v-8h4z"/></svg>
+              <h3>No faults detected</h3>
+              <p>Fault detection will appear after analysis.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /left column -->
+
+    <!-- ── RIGHT COLUMN ────────────────────────────── -->
+    <div id="audio-results-section" style="display:none;display:flex;flex-direction:column;gap:1.25rem">
+
+      <!-- Waveform plot -->
+      <div class="card">
+        <div class="card__header">
+          <span class="card__title">
+            <svg class="card__title-icon" viewBox="0 0 16 16"><path d="M1 8h2V5h2v6h2V3h2v10h2V1h2v14h2V5h2v6h2V8h2v1h-2v5h-2V5h-2V1h-2v14h-2V3h-2v10h-2V5h-2v6h-2V8H1z"/></svg>
+            Time-Domain Waveform
+          </span>
+        </div>
+        <div class="card__body card__body--tight">
+          <div class="plot-panel" id="waveform-plot">
+            <div class="plot-empty">
+              <svg viewBox="0 0 32 32"><path d="M1 16h4V9h4v14h4V4h4v24h4V9h4v14h4v-7h4v7h2v2H1z"/></svg>
+              <span>Waveform will appear after analysis</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FFT Spectrum plot -->
+      <div class="card">
+        <div class="card__header">
+          <span class="card__title">
+            <svg class="card__title-icon" viewBox="0 0 16 16"><path d="M1 14V4h2v10zm3 0V7h2v7zm3 0V2h2v12zm3 0V5h2v9zm3 0V9h2v5z"/></svg>
+            FFT Frequency Spectrum
+          </span>
+          <div class="card__actions">
+            <span style="font-size:var(--fs-xs);color:var(--gray-60)">Log scale</span>
+          </div>
+        </div>
+        <div class="card__body card__body--tight">
+          <div class="plot-panel" id="fft-plot">
+            <div class="plot-empty">
+              <svg viewBox="0 0 32 32"><path d="M1 14V4h2v10zm3 0V7h2v7zm3 0V2h2v12zm3 0V5h2v9zm3 0V9h2v5z"/></svg>
+              <span>Spectrum will appear after analysis</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dominant Frequencies -->
+      <div class="card">
+        <div class="card__header">
+          <span class="card__title">
+            <svg class="card__title-icon" viewBox="0 0 16 16"><path d="M2 12h2V6H2zm4 0h2V2H6zm4 0h2V4h-2zm4 0h2V8h-2z"/></svg>
+            Dominant Frequencies
+          </span>
+        </div>
+        <div class="card__body card__body--tight">
+          <div id="dominant-freqs">
+            <p style="font-size:var(--fs-sm);color:var(--gray-60);text-align:center;padding:.75rem 0">
+              Frequency data will appear after analysis.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Spectrogram -->
+      <div class="card">
+        <div class="card__header">
+          <span class="card__title">
+            <svg class="card__title-icon" viewBox="0 0 16 16"><path d="M1 2h14v12H1zm1 1v10h12V3z"/></svg>
+            STFT Spectrogram
+          </span>
+        </div>
+        <div class="card__body card__body--tight">
+          <div class="plot-panel" id="spectrogram-plot">
+            <div class="plot-empty">
+              <svg viewBox="0 0 32 32"><path d="M4 4h24v24H4z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+              <span>Spectrogram will appear after analysis</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mel Spectrogram -->
+      <div class="card">
+        <div class="card__header">
+          <span class="card__title">
+            <svg class="card__title-icon" viewBox="0 0 16 16"><path d="M1 2h14v12H1zm1 1v10h12V3z"/></svg>
+            Mel Spectrogram
+          </span>
+        </div>
+        <div class="card__body card__body--tight">
+          <div class="plot-panel" id="mel-plot">
+            <div class="plot-empty">
+              <svg viewBox="0 0 32 32"><path d="M4 4h24v24H4z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+              <span>Mel spectrogram will appear after analysis</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /audio results -->
+  </div><!-- /audio grid -->
+
+  <!-- Granite Explanation (full width below) -->
+  <div style="margin-top:1.25rem">
+    {% include "partials/granite_panel.html" %}
+  </div>
+
+  <!-- Report download bar -->
+  <div class="report-bar" id="report-download-bar" style="display:none;margin-top:1.25rem">
+    <svg class="report-bar__icon" viewBox="0 0 16 16"><path d="M8 1a.75.75 0 0 1 .75.75v6.19l1.97-1.97a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.03a.75.75 0 0 1 1.06-1.06l1.97 1.97V1.75A.75.75 0 0 1 8 1zM2 14.5A.75.75 0 0 1 2.75 14h10.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 14.5z"/></svg>
+    <div class="report-bar__text">
+      <p class="report-bar__title">Engineering Report Ready</p>
+      <p class="report-bar__sub">Download the full PDF report with all plots, metrics, and analysis.</p>
+    </div>
+    <button class="btn btn--primary" id="btn-download-report" disabled>
+      Download PDF Report
+    </button>
+  </div>
+
+</div><!-- /tab-audio -->
+
+
+<!-- ════════════════════════════════════════════════════════
+     TAB 2 — CIRCUIT DIAGNOSTICS
+     ════════════════════════════════════════════════════════ -->
+<div class="tab-pane" id="tab-circuit">
+  {% include "partials/circuit_form.html" %}
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     TAB 3 — ENGINEERING Q&A
+     ════════════════════════════════════════════════════════ -->
+<div class="tab-pane" id="tab-qa">
+  <div class="card" style="max-width:760px;margin:0 auto">
+    <div class="card__header">
+      <span class="card__title">
+        <svg class="card__title-icon" viewBox="0 0 16 16"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h11A1.5 1.5 0 0 1 15 2.5v8A1.5 1.5 0 0 1 13.5 12H9.06l-2.78 2.78A.75.75 0 0 1 5 14.25V12H2.5A1.5 1.5 0 0 1 1 10.5z"/></svg>
+        Engineering Q&amp;A
+      </span>
+      <span class="granite-powered-badge">IBM Granite</span>
+    </div>
+    <div class="card__body">
+      <div class="alert alert--info" style="margin-bottom:1rem">
+        <svg class="alert__icon" viewBox="0 0 16 16"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 10.5a.75.75 0 0 1-1.5 0V7.25a.75.75 0 0 1 1.5 0zM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg>
+        Ask engineering questions about your analysis session. Run an audio or circuit analysis first.
+      </div>
+      <div class="qa-form">
+        <textarea id="qa-input" placeholder="e.g. Why is the output clipping? How can I reduce hum noise?" rows="3"></textarea>
+        <button class="btn btn--primary" id="btn-qa-submit" style="align-self:flex-end">Ask</button>
+      </div>
+      <div class="qa-history" id="qa-history"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     TAB 4 — SESSION HISTORY
+     ════════════════════════════════════════════════════════ -->
+<div class="tab-pane" id="tab-history">
+  <div class="card">
+    <div class="card__header">
+      <span class="card__title">
+        <svg class="card__title-icon" viewBox="0 0 16 16"><path d="M1.75 2A.75.75 0 0 1 2.5 1h11a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-11a.75.75 0 0 1-.75-.75zm1.5.75v11h10v-11z"/></svg>
+        Analysis Session History
+      </span>
+      <button class="btn btn--ghost btn--sm" onclick="loadHistory()">Refresh</button>
+    </div>
+    <div class="card__body card__body--flush">
+      <div id="history-table-container" style="padding:1.25rem">
+        <div class="empty-state">
+          <svg viewBox="0 0 32 32"><path d="M16 2a14 14 0 1 0 0 28A14 14 0 0 0 16 2zm1 21h-2v-8h2zm0-10h-2V11h2z"/></svg>
+          <h3>No sessions yet</h3>
+          <p>Completed analyses will appear here.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+
+{% block scripts_extra %}
+<script>
+async function loadHistory() {
+  const container = document.getElementById('history-table-container');
+  try {
+    const resp = await fetch('/api/history');
+    const json = await resp.json();
+    const sessions = json.data?.sessions || [];
+    if (!sessions.length) return;
+
+    const rows = sessions.map(s => `
+      <tr>
+        <td style="font-family:var(--font-mono);font-size:var(--fs-xs)">${s.session_uid?.slice(0,8)}…</td>
+        <td><span class="badge badge--info">${s.session_type}</span></td>
+        <td style="font-size:var(--fs-xs)">${s.created_at || ''}</td>
+        <td><span class="badge badge--${s.status === 'complete' ? 'low' : 'none'}">${s.status}</span></td>
+        <td style="font-size:var(--fs-xs)">${s.primary_issue || s.filename || '—'}</td>
+      </tr>`).join('');
+
+    container.innerHTML = `
+      <table class="data-table">
+        <thead>
+          <tr><th>Session</th><th>Type</th><th>Date</th><th>Status</th><th>Primary Finding</th></tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  } catch(err) {
+    container.innerHTML = `<div class="alert alert--error"><span>Failed to load history: ${err.message}</span></div>`;
+  }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelector('[data-tab="tab-history"]')?.addEventListener('click', loadHistory);
+});
+</script>
+{% endblock %}

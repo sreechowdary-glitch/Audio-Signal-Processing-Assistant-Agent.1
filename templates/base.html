@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Audio Intelligence & Circuit Diagnostic Platform{% endblock %}</title>
+  <meta name="description" content="IBM SkillsBuild · Edunet Foundation — Audio Signal Processing & Circuit Diagnostic Platform"/>
+
+  <!-- IBM Plex fonts (optional CDN) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <!-- Platform CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}"/>
+
+  {% block head_extra %}{% endblock %}
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- ── Top Navigation Bar ─────────────────────────────── -->
+  <header class="topbar" role="banner">
+    <div class="topbar__brand">
+      <!-- Waveform icon -->
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M2 12h2V8h2v8h2V6h2v12h2V4h2v16h2V8h2v8h2v-4h2v4"/>
+      </svg>
+      Audio Intelligence &amp; Circuit Diagnostic Platform
+      <span class="topbar__badge">v1.0</span>
+    </div>
+
+    <div class="topbar__spacer"></div>
+
+    <!-- Granite status indicator -->
+    <div class="topbar__status">
+      <span class="status-dot" id="granite-status-dot"></span>
+      <span id="granite-status-label" style="font-size:var(--fs-xs)">Checking AI…</span>
+    </div>
+  </header>
+
+  <!-- ── Tab Navigation ────────────────────────────────── -->
+  <nav class="tab-nav" role="navigation" aria-label="Main sections">
+    <button class="tab-btn active" data-tab="tab-audio"   aria-selected="true">
+      🎵 Audio Analysis
+    </button>
+    <button class="tab-btn" data-tab="tab-circuit" aria-selected="false">
+      ⚙️ Circuit Diagnostics
+    </button>
+    <button class="tab-btn" data-tab="tab-qa"      aria-selected="false">
+      💬 Engineering Q&amp;A
+    </button>
+    <button class="tab-btn" data-tab="tab-history" aria-selected="false">
+      📋 Session History
+    </button>
+  </nav>
+
+  <!-- ── Main content ──────────────────────────────────── -->
+  <main class="main-content" id="main" role="main">
+    {% block content %}{% endblock %}
+  </main>
+
+</div><!-- /app-shell -->
+
+<!-- Toast container -->
+<div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+<!-- JS — load order matters: main first, then modules -->
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/chart_renderer.js') }}"></script>
+<script src="{{ url_for('static', filename='js/health_gauge.js') }}"></script>
+<script src="{{ url_for('static', filename='js/audio_upload.js') }}"></script>
+<script src="{{ url_for('static', filename='js/circuit_form.js') }}"></script>
+<script src="{{ url_for('static', filename='js/granite_panel.js') }}"></script>
+
+{% block scripts_extra %}{% endblock %}
+</body>
+</html>
